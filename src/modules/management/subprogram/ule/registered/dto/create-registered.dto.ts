@@ -31,6 +31,10 @@ export class CreateRegisteredDto {
 
   @IsOptional()
   @IsString()
+  observation?: string;
+
+  @IsOptional()
+  @IsString()
   latitude?: string;
 
   @IsOptional()

@@ -1,13 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Send } from '@prisma/client';
+import { General, Send } from '@prisma/client';
 import { FilterGeneralDto } from './dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { filterGeneral } from './helpers';
 import { paginationHelper, timezoneHelper } from '../../../common/helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class GeneralService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService
+  ) {}
 
   async findAll(dto: FilterGeneralDto): Promise<any> {
     const { where, pagination } = filterGeneral(dto);
@@ -34,6 +37,10 @@ export class GeneralService {
       },
       pagination,
     );
+  }
+
+  async findOne(id: string): Promise<General> {
+      return await this.getCitizenById(id);
   }
 
   async getForMessage() {
@@ -87,35 +94,23 @@ export class GeneralService {
 
   private async getCitizenById(id: string) {
     const citizen = await this.prisma.general.findFirst({
-      where: { id },
+      where: {
+        deleted_at: null,
+        OR: [
+          { id },
+          { citizen_id: id },
+          { dni: id },
+        ],
+      },
     });
-    if (!citizen) throw new BadRequestException('Persona no encontrada');
+    if (!citizen) {
+      throw new BadRequestException('Persona no encontrada');
+    }
     return citizen;
   }
   
-async updateObservation(citizen_id: string, observation: string) {
-  const result = await this.prisma.general.updateMany({
-    where: {
-      citizen_id,
-      deleted_at: null,
-    },
-    data: {
-      observation,
-      updated_at: timezoneHelper(),
-    },
-  });
-  if (result.count === 0) {
-    throw new BadRequestException('No se encontró el registro en general');
-  }
-    await this.prisma.patient.update({
-      where: {
-        id: citizen_id,
-      },
-      data: {
-        observation,
-        updated_at: timezoneHelper(),
-      },
-    });
+  async updateObservation(citizen_id: string, observation: string) {
+    await this.observationService.syncObservation(citizen_id, observation);
     return { success: true };
   }
 }

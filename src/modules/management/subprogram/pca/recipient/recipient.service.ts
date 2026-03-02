@@ -12,10 +12,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterRecipient } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class RecipientService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateRecipientDto): Promise<Recipient> {
     const { birthday, registered_at, ...res } = dto;
@@ -49,7 +52,7 @@ export class RecipientService {
 
   async update(id: string, dto: UpdateRecipientDto): Promise<Recipient> {
     await this.getRecipientById(id);
-    const { birthday, registered_at, ...res } = dto;
+    const { observation,birthday, registered_at, ...res } = dto;
     await this.prisma.recipient.update({
       data: {
         ...res,
@@ -59,6 +62,11 @@ export class RecipientService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'recipient',
+    )
     return await this.getRecipientById(id);
   }
 

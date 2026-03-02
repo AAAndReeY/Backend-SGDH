@@ -11,10 +11,13 @@ import {
   paginationHelper,
   timezoneHelper,
 } from '../../../../../common/helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class NeighborsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateNeighborsDto): Promise<President> {
     const neighbors = await this.prisma.neighbors.create({

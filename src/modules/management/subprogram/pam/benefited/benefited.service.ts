@@ -11,10 +11,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterBenefited, selectBenefited } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class BenefitedService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateBenefitedDto): Promise<Benefited> {
     const benefited = await this.prisma.benefited.create({

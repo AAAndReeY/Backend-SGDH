@@ -12,10 +12,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterParticipant, selectParticipant } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class ParticipantService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateParticipantDto): Promise<Participant> {
     const { birthday, ...res } = dto;

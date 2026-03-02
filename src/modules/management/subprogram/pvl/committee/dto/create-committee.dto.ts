@@ -38,10 +38,6 @@ export class CreateCommitteeDto {
   @IsString()
   commune?: string;
 
-  @IsOptional()
-  @IsString()
-  observation?: string;
-
   @IsUUID()
   coordinator_id: string;
 

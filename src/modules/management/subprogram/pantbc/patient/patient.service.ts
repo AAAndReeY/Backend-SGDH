@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Patient } from '@prisma/client';
-import { GeneralService } from 'src/modules/management/general/general.service';
 import { CreatePatientDto, FilterPatientDto, UpdatePatientDto } from './dto';
 import { PrismaService } from '../../../../../prisma/prisma.service';
 import {
@@ -9,12 +8,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterPatient, selectPatient } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class PatientService {
   constructor(private readonly prisma: PrismaService,
-    private readonly generalservice: GeneralService) 
-  {}
+    private readonly observationService: ObservationService
+  ) {}
   async create(dto: CreatePatientDto): Promise<Patient> {
     const { start_at, birthday, assignee_birthday, ...res } = dto;
     const patient = await this.prisma.patient.create({
@@ -83,20 +83,10 @@ export class PatientService {
     },
     where: { id },
   });
-  if (observation !== undefined) {
-    await this.generalservice.updateObservation(id, observation);
-    ({
-      where: {
-        citizen_id: id,
-        deleted_at: null,
-      },
-      data: {
-        observation,
-      },
-    });
-  }
+  await this.observationService.syncObservation(id, observation, 'patient');
+
   return await this.getPatientById(id);
-}
+  }
 
   async toggleDelete(id: string): Promise<any> {
     const patient = await this.getPatientById(id, true);

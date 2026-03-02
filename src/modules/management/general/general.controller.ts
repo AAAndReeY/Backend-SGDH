@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Query } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Query, ParseUUIDPipe } from '@nestjs/common';
 import { GeneralService } from './general.service';
 import { FilterGeneralDto } from './dto';
 
@@ -9,6 +9,11 @@ export class GeneralController {
   @Get()
   findAll(@Query() dto: FilterGeneralDto) {
     return this.generalService.findAll(dto);
+  }
+
+  @Get(':id')
+    findOne(@Param('id', ParseUUIDPipe) id: string) {
+      return this.generalService.findOne(id);
   }
 
   @Patch('send/:id')

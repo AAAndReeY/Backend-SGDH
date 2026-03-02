@@ -12,10 +12,13 @@ import {
   paginationHelper,
   timezoneHelper,
 } from '../../../../../common/helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class PresidentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreatePresidentDto): Promise<President> {
     const president = await this.prisma.president.create({
@@ -53,6 +56,7 @@ export class PresidentService {
 
   async update(id: string, dto: UpdatePresidentDto): Promise<President> {
     await this.getPresidentById(id);
+    const { observation, ...res } = dto
     await this.prisma.president.update({
       data: {
         ...dto,
@@ -60,6 +64,11 @@ export class PresidentService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'president',
+    );
     return await this.getPresidentById(id);
   }
 

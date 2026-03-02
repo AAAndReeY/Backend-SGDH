@@ -12,10 +12,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterDependent, selectDependent } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class DependentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateDependentDto): Promise<Dependent> {
     const { birthday, breastfeeding_end_at, due_at, start_at, ...res } = dto;
@@ -54,7 +57,7 @@ export class DependentService {
 
   async update(id: string, dto: UpdateDependentDto): Promise<Dependent> {
     await this.getDependentById(id);
-    const { birthday, breastfeeding_end_at, due_at, start_at, ...res } = dto;
+    const { observation, birthday, breastfeeding_end_at, due_at, start_at, ...res } = dto;
     await this.prisma.dependent.update({
       data: {
         ...res,
@@ -68,6 +71,11 @@ export class DependentService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'dependent',
+    )
     return await this.getDependentById(id);
   }
 

@@ -27,6 +27,10 @@ export class CreateRecipientDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  observation?: string;
+
+  @IsOptional()
   @IsBoolean()
   pregnant?: boolean;
 

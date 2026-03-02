@@ -7,10 +7,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterDisabled, selectDisabled } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class DisabledService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
   async create(dto: CreateDisabledDto): Promise<Disabled> {
     const disabled = await this.prisma.disabled.create({
       data: {
@@ -41,6 +44,7 @@ export class DisabledService {
 
   async update(id: string, dto: UpdateDisabledDto): Promise<Disabled> {
     await this.getDisabledById(id);
+    const { observation, ...res } = dto
     await this.prisma.disabled.update({
       data: {
         ...dto,
@@ -48,6 +52,11 @@ export class DisabledService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'disabled',
+    );
     return await this.getDisabledById(id);
   }
 

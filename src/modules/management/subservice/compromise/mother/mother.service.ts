@@ -8,10 +8,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { filterMother } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class MotherService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateMotherDto): Promise<Mother> {
     const { birthday, ...res } = dto;

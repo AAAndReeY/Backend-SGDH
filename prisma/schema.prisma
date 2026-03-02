@@ -204,6 +204,7 @@ model Mother {
   phone                         String?
   sex                           Sex?
   birthday                      DateTime?
+  observation                   String?
   created_at                    DateTime                        @default(now())
   updated_at                    DateTime                        @updatedAt
   deleted_at                    DateTime?
@@ -229,6 +230,7 @@ model Disabled {
   doc_num                       String?
   phone                         String?
   sex                           Sex?
+  observation                   String?
   address                       String?
   certificate                   String?
   diagnostic1                   String?
@@ -339,6 +341,7 @@ model Benefited {
   address                       String
   cellphone                     String?
   telephone                     String?
+  observation                   String?
   assessment_cognitive          Int                             @default(0)
   assessment_emotional          Int                             @default(0)
   assessment_functional         Int                             @default(0)
@@ -560,6 +563,7 @@ model Patient {
   lastname                      String
   address                       String?
   phone                         String?
+  observation                   String?
   center                        String?
   delivery                      String?
   treatment                     String
@@ -615,6 +619,7 @@ model Neighbors {
   lastname                      String
   dni                           String                          @unique
   phone                         String?
+  observation                   String?
   sex                           Sex?
   birthday                      DateTime?
   pueblo                        String
@@ -693,6 +698,7 @@ model President {
   lastname                      String
   dni                           String?
   phone                         String?
+  observation                   String?
   birthday                      DateTime?
   created_at                    DateTime                        @default(now())
   updated_at                    DateTime                        @updatedAt
@@ -710,6 +716,7 @@ model Recipient {
   name                          String
   address                       String?
   phone                         String?
+  observation                   String?
   pregnant                      Boolean                         @default(false)
   disabled                      Boolean                         @default(false)
   assignee_doc_num              String?
@@ -771,6 +778,7 @@ model Coordinator {
   lastname                      String
   dni                           String?
   phone                         String?
+  observation                   String?
   sex                           Sex?
   birthday                      DateTime?
   created_at                    DateTime                        @default(now())
@@ -799,6 +807,7 @@ model Dependent {
   lastname                      String
   name                          String
   phone                         String?
+  observation                   String?
   sex                           Sex?
   bond                          String?
   semester_leave                String?
@@ -838,6 +847,7 @@ model Participant {
   name                          String
   dni                           String
   phone                         String?
+  observation                   String?
   sex                           Sex?
   assignee                      String?
   birthday                      DateTime?
@@ -904,6 +914,7 @@ model Enumerator {
   name                          String
   lastname                      String
   phone                         String?
+  observation                   String?
   sex                           Sex?
   birthday                      DateTime?
   created_at                    DateTime                        @default(now())
@@ -922,6 +933,7 @@ model Registered {
   name                          String
   lastname                      String
   phone                         String?
+  observation                   String?
   sex                           Sex?
   latitude                      Float?
   longitude                     Float?

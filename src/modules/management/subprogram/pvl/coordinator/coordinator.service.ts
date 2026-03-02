@@ -12,10 +12,13 @@ import {
   paginationHelper,
   timezoneHelper,
 } from '../../../../../common/helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class CoordinatorService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateCoordinatorDto): Promise<Coordinator> {
     const coordinator = await this.prisma.coordinator.create({
@@ -46,6 +49,7 @@ export class CoordinatorService {
 
   async update(id: string, dto: UpdateCoordinatorDto): Promise<Coordinator> {
     await this.getCoordinatorById(id);
+    const { observation, ...res } = dto
     await this.prisma.coordinator.update({
       data: {
         ...dto,
@@ -53,6 +57,11 @@ export class CoordinatorService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'coordinator',
+    )
     return await this.getCoordinatorById(id);
   }
 

@@ -24,6 +24,10 @@ export class CreateDisabledDto {
 
   @IsOptional()
   @IsString()
+  observation?: string;
+
+  @IsOptional()
+  @IsString()
   address?: string;
 
   @IsOptional()

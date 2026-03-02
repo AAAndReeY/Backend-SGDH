@@ -9,10 +9,13 @@ import {
   timezoneHelper,
 } from '../../../../../common/helpers';
 import { SearchDto } from '../../../../../common/dto';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class EnumeratorService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateEnumeratorDto): Promise<Enumerator> {
     const { birthday, ...res } = dto;

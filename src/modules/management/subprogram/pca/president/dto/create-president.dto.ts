@@ -21,5 +21,9 @@ export class CreatePresidentDto {
 
   @IsOptional()
   @IsString()
+  observation?: string;
+
+  @IsOptional()
+  @IsString()
   birthday?: string;
 }

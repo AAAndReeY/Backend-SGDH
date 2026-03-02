@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { PatientController } from './patient.controller';
-import { GeneralModule } from 'src/modules/management/general/general.module';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
-  imports: [GeneralModule],
+  imports: [CommonModule],
   controllers: [PatientController],
   providers: [PatientService],
 })

@@ -14,10 +14,13 @@ import {
 } from '../../../../../common/helpers';
 import { SearchDto } from 'src/common/dto';
 import { filterRegistered } from './helpers';
+import { ObservationService } from 'src/common/services/observation.service';
 
 @Injectable()
 export class RegisteredService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService,
+  private readonly observationService: ObservationService,
+  ) {}
 
   async create(dto: CreateRegisteredDto): Promise<Registered> {
     const { latitude, longitude, members, birthday, ...res } = dto;
@@ -58,7 +61,7 @@ export class RegisteredService {
 
   async update(id: string, dto: UpdateRegisteredDto): Promise<Registered> {
     await this.getRegisteredById(id);
-    const { latitude, longitude, members, birthday, ...res } = dto;
+    const { observation,latitude, longitude, members, birthday, ...res } = dto;
     const data: any = {
       ...res,
       ...(latitude && { latitude: Number(latitude) }),
@@ -71,6 +74,11 @@ export class RegisteredService {
       data,
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'registered',
+    )
     return await this.getRegisteredById(id);
   }
 
