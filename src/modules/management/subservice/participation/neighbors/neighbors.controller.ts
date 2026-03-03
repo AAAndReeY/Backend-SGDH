@@ -7,9 +7,10 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { NeighborsService } from './neighbors.service';
-import { CreateNeighborsDto, FilterNeighborsDto } from './dto';
+import { CreateNeighborsDto, FilterNeighborsDto, UpdateNeighborsDto } from './dto';
 
 @Controller('participation/neighbors')
 export class NeighborsController {
@@ -28,6 +29,14 @@ export class NeighborsController {
   @Post()
   create(@Body() dto: CreateNeighborsDto) {
     return this.neighborsService.create(dto);
+  }
+
+  @Patch(':id')
+    update(
+      @Param('id', ParseUUIDPipe) id: string,
+      @Body() dto: UpdateNeighborsDto,
+    ) {
+      return this.neighborsService.update(id, dto);
   }
 
   @Delete(':id')

@@ -52,7 +52,7 @@ export class ParticipantService {
 
   async update(id: string, dto: UpdateParticipantDto): Promise<Participant> {
     await this.getParticipantById(id);
-    const { birthday, ...res } = dto;
+    const { observation, birthday, ...res } = dto;
     await this.prisma.participant.update({
       data: {
         ...res,
@@ -61,6 +61,11 @@ export class ParticipantService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'participant',
+    )
     return await this.getParticipantById(id);
   }
 

@@ -15,6 +15,10 @@ export class CreateNeighborsDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  observation?: string;
+
+  @IsOptional()
   @IsDateString()
   birthday?: string;
 

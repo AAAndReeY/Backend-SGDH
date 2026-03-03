@@ -16,6 +16,10 @@ export class CreateParticipantDto {
 
   @IsOptional()
   @IsString()
+  observation?: string;
+
+  @IsOptional()
+  @IsString()
   assignee?: string;
 
   @IsOptional()

@@ -48,6 +48,7 @@ export class NeighborsService {
 
   async update(id: string, dto: UpdateNeighborsDto): Promise<Neighbors> {
     await this.getNeighborsById(id);
+    const { observation, ...res } = dto
     await this.prisma.neighbors.update({
       data: {
         ...dto,
@@ -55,6 +56,11 @@ export class NeighborsService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'neighbors',
+    )
     return await this.getNeighborsById(id);
   }
 

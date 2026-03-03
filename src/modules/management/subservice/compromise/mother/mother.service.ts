@@ -47,7 +47,7 @@ export class MotherService {
 
   async update(id: string, dto: UpdateMotherDto): Promise<Mother> {
     await this.getMotherById(id);
-    const { birthday, ...res } = dto;
+    const { observation, birthday, ...res } = dto;
     await this.prisma.mother.update({
       data: {
         ...res,
@@ -56,6 +56,11 @@ export class MotherService {
       },
       where: { id },
     });
+    await this.observationService.syncObservation(
+      id,
+      observation,
+      'mother',
+    );
     return await this.getMotherById(id);
   }
 
