@@ -22,6 +22,10 @@ export class CreateMotherDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  observation?: string;
+
+  @IsOptional()
   @IsDateString()
   birthday?: string;
 

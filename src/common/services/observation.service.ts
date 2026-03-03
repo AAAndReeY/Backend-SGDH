@@ -11,7 +11,10 @@ export type ObservationModel =
   | 'recipient'
   | 'coordinator'
   | 'dependent'
-  | 'registered';
+  | 'registered'
+  | 'mother'
+  | 'neighbors'
+  | 'participant';
 
 const ALL_SUB_MODELS: ObservationModel[] = [
   'disabled',
@@ -22,6 +25,9 @@ const ALL_SUB_MODELS: ObservationModel[] = [
   'coordinator',
   'dependent',
   'registered',
+  'mother',
+  'neighbors',
+  'participant',
 ];
 
 @Injectable()
