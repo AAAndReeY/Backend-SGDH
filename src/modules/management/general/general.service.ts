@@ -110,6 +110,7 @@ export class GeneralService {
   }
   
   async updateObservation(citizen_id: string, observation: string) {
+    await this.getCitizenById(citizen_id);
     await this.observationService.syncObservation(citizen_id, observation);
     return { success: true };
   }
