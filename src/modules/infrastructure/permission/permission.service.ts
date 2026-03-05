@@ -10,6 +10,13 @@ export class PermissionService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreatePermissionDto): Promise<Permission> {
+    const exists = await this.prisma.permission.findFirst({
+      where: {
+        ability: dto.ability,
+        module_id: dto.module_id,
+      },
+    });
+    if (exists) throw new BadRequestException('Este permiso ya existe para ese módulo');
     const permission = await this.prisma.permission.create({
       data: {
         ...dto,
@@ -23,12 +30,12 @@ export class PermissionService {
   async findAll(dto: SearchDto): Promise<any> {
     const { search, ...pagination } = dto;
     const where: any = { deleted_at: null };
-    if (search) where.name = String(search);
     return paginationHelper(
       this.prisma.permission,
       {
         where,
-        orderBy: { name: 'asc' },
+        orderBy: { ability: 'asc' },
+        include: { module: true },
       },
       pagination,
     );
@@ -67,12 +74,10 @@ export class PermissionService {
     };
   }
 
-  private async getPermissionById(
-    id: string,
-    toogle: boolean = false,
-  ): Promise<Permission> {
+  private async getPermissionById(id: string, toogle: boolean = false): Promise<any> {
     const permission = await this.prisma.permission.findUnique({
       where: { id },
+      include: { module: true }, // 👈
     });
     if (!permission) throw new BadRequestException('Permiso no encontrado');
     if (permission.deleted_at && !toogle)

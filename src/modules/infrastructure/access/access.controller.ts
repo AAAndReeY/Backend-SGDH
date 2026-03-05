@@ -8,11 +8,14 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AccessService } from './access.service';
 import { CreateAccessDto, UpdateAccessDto } from './dto';
 import { SearchDto } from '../../../common/dto';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('initial/access')
 export class AccessController {
   constructor(private readonly accessService: AccessService) {}

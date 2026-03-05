@@ -1,7 +1,9 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
 import { ModuleService } from './module.service';
 import { FilterModuleDto } from './dto';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('module')
 export class ModuleController {
   constructor(private readonly ModuleService: ModuleService) {}

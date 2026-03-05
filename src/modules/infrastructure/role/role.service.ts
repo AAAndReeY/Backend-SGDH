@@ -10,6 +10,10 @@ export class RoleService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateRoleDto): Promise<Role> {
+    const exists = await this.prisma.role.findUnique({
+      where: { name: dto.name },
+    });
+    if (exists) throw new BadRequestException(`El rol "${dto.name}" ya existe`);
     const role = await this.prisma.role.create({
       data: {
         ...dto,
@@ -42,11 +46,14 @@ export class RoleService {
     const role = await this.getRoleById(id);
     if (role.is_super)
       throw new BadRequestException('Este rol no se puede actualizar');
+    if (dto.name) {
+      const exists = await this.prisma.role.findFirst({
+        where: { name: dto.name, NOT: { id } },
+      });
+      if (exists) throw new BadRequestException(`El rol "${dto.name}" ya existe`);
+    }
     await this.prisma.role.update({
-      data: {
-        ...dto,
-        updated_at: timezoneHelper(),
-      },
+      data: { ...dto, updated_at: timezoneHelper() },
       where: { id },
     });
     return await this.getRoleById(id);

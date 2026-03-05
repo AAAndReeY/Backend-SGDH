@@ -7,7 +7,7 @@ export class CreateAssignmentDto {
 
   @IsOptional()
   @IsUUID()
-  permission_id?: string;
+  program_id?: string;
 
   @IsUUID()
   role_id: string;

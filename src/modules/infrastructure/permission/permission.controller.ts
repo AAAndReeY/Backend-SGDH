@@ -8,11 +8,14 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto, UpdatePermissionDto } from './dto';
 import { SearchDto } from '../../../common/dto';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('initial/permission')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
