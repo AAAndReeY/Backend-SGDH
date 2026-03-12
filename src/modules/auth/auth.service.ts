@@ -85,4 +85,51 @@ export class AuthService {
     },
   });
 }
+
+async getMe(userId: string) {
+  const assignments = await this.prisma.assignment.findMany({
+    where: {
+      user_id: userId,
+      deleted_at: null,
+    },
+    include: {
+      role: {
+        include: {
+          accesses: {
+            where: { deleted_at: null },
+            include: {
+              permission: {
+                include: { module: true },
+              },
+            },
+          },
+        },
+      },
+      module: true,
+    },
+  });
+  const isSuperAdmin = assignments.some((a) => a.role.is_super);
+  if (isSuperAdmin) {
+    const allModules = await this.prisma.module.findMany({
+      where: { deleted_at: null },
+    });
+    return {
+      is_super: true,
+      modules: allModules.map((m) => ({
+        id: m.id,
+        name: m.name,
+        abilities: ['CREATE', 'READ', 'UPDATE', 'DELETE'],
+      })),
+    };
+  }
+  const modules = assignments.map((a) => ({
+    id: a.module?.id,
+    name: a.module?.name,
+    abilities: a.role.accesses.map((ac) => ac.permission.ability),
+  }));
+  return {
+    is_super: false,
+    modules,
+  };
+}
 }
