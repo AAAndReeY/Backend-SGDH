@@ -7,7 +7,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-  schemas   = ["initial", "compromise", "pam", "pantbc", "pca", "pvl", "omaped", "recreation", "ule", "participation"]
+  schemas   = ["initial", "compromise", "pam", "pantbc", "pca", "pvl", "omaped", "recreation", "ule", "participation" , "camsup"]
 }
 
 // >> SCHEMA: initial
@@ -211,6 +211,23 @@ model Mother {
   doc_type                      Doctype?
   @@map("mother")
   @@schema("compromise")
+}
+
+// >> SCHEMA: CAMSUP
+model Sup {
+  id                            String                          @id @default(uuid())
+  name                          String
+  lastname                      String
+  dni                           String                          @unique
+  phone                         String?
+  district                      String
+  populated                     String
+  created_at                    DateTime?
+  updated_at                    DateTime?
+  deleted_at                    DateTime?
+
+  @@map("sup")
+  @@schema("camsup")
 }
 
 // >> SCHEMA: OMAPED
