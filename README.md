@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
   <a href="https://web.munisjl.gob.pe/web/" target="blank">
     <img src="./client/logo.png" width="320" alt="MDSJL" />
@@ -74,3 +75,7 @@ El sistema backend utiliza el framework **NestJS** bajo la Licencia MIT.
   <br>
   <img src="./client/logo.png" width="320" alt="MDSJL" />
 </p>
+=======
+# Backend-SGDH
+Sistema de la Gerencia de Desarrollo Humano de la Municipalidad de San Juan de Lurigancho que agrupa las distintas áreas y necesidades de la Subgerencia de Servicios Sociales y la Subgerencia de Programas Sociales
+>>>>>>> d687ee5ef00c7044e41b622055aca90e11387262
