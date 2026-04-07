@@ -1,0 +1,41 @@
+export function selectDependent(all: boolean = false): any {
+  if (all)
+    return {
+      id: true,
+      committee: true,
+      doc_num: true,
+      lastname: true,
+      name: true,
+      phone: true,
+      sex: true,
+      priority: true,
+      birthday: true,
+      doc_type: true,
+    };
+  return {
+    id: true,
+    committee: true,
+    doc_num: true,
+    lastname: true,
+    name: true,
+    phone: true,
+    sex: true,
+    bond: true,
+    observation: true,
+    semester_leave: true,
+    priority: true,
+    pregnant_weeks: true,
+    pregnant: true,
+    disabled: true,
+    tbc: true,
+    malnutrition: true,
+    breastfeeding_end_at: true,
+    due_at: true,
+    start_at: true,
+    birthday: true,
+    created_at: true,
+    updated_at: true,
+    deleted_at: true,
+    doc_type: true,
+  };
+}
