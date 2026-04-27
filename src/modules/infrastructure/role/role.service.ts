@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Role } from '@prisma/client';
-import { CreateRoleDto, UpdateRoleDto } from './dto';
+import { Ability, Role } from '@prisma/client';
+import { CreateRoleDto, SetRolePermissionsDto, UpdateRoleDto } from './dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { paginationHelper, timezoneHelper } from '../../../common/helpers';
 import { SearchDto } from '../../../common/dto';
@@ -76,6 +76,95 @@ export class RoleService {
       action: inactive ? 'Restore' : 'Delete',
       id,
     };
+  }
+
+  async getPermissionsMatrix(roleId: string): Promise<any> {
+    const role = await this.getRoleById(roleId);
+
+    const [modules, accesses] = await Promise.all([
+      this.prisma.module.findMany({
+        where: { deleted_at: null },
+        orderBy: [{ program: { name: 'asc' } }, { name: 'asc' }],
+        include: { program: true },
+      }),
+      this.prisma.access.findMany({
+        where: { role_id: roleId, deleted_at: null },
+        include: { permission: true },
+      }),
+    ]);
+
+    const abilities: Ability[] = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
+
+    return {
+      role,
+      modules: modules.map((mod) => ({
+        id: mod.id,
+        name: mod.name,
+        program: mod.program?.name ?? null,
+        permissions: Object.fromEntries(
+          abilities.map((ability) => {
+            const access = accesses.find(
+              (a) =>
+                a.permission.module_id === mod.id &&
+                a.permission.ability === ability,
+            );
+            return [
+              ability,
+              { access_id: access?.id ?? null, enabled: !!access },
+            ];
+          }),
+        ),
+      })),
+    };
+  }
+
+  async setPermissions(
+    roleId: string,
+    dto: SetRolePermissionsDto,
+  ): Promise<any> {
+    const role = await this.getRoleById(roleId);
+    if (role.is_super)
+      throw new BadRequestException(
+        'No se pueden modificar permisos del super admin',
+      );
+
+    // Hard-delete all existing accesses for this role
+    await this.prisma.access.deleteMany({ where: { role_id: roleId } });
+
+    for (const item of dto.permissions) {
+      // Find or create the Permission record
+      let permission = await this.prisma.permission.findFirst({
+        where: { module_id: item.module_id, ability: item.ability },
+      });
+
+      if (!permission) {
+        permission = await this.prisma.permission.create({
+          data: {
+            module_id: item.module_id,
+            ability: item.ability,
+            created_at: timezoneHelper(),
+            updated_at: timezoneHelper(),
+          },
+        });
+      } else if (permission.deleted_at) {
+        permission = await this.prisma.permission.update({
+          where: { id: permission.id },
+          data: { deleted_at: null, updated_at: timezoneHelper() },
+        });
+      }
+
+      // Create the Access record
+      await this.prisma.access.create({
+        data: {
+          role_id: roleId,
+          permission_id: permission.id,
+          created_at: timezoneHelper(),
+          updated_at: timezoneHelper(),
+        },
+      });
+    }
+
+    return this.getPermissionsMatrix(roleId);
   }
 
   private async getRoleById(
