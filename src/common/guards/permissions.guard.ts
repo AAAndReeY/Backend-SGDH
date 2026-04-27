@@ -24,18 +24,24 @@ export class PermissionsGuard implements CanActivate {
     const { ability, moduleName } = permission;
     const req = context.switchToHttp().getRequest();
     if (!req.user) throw new UnauthorizedException('No autenticado');
+
+    // Super admin: el JWT ya trae is_super, no hace falta consultar la BD
+    if (req.user.is_super) return true;
+
     const userId = req.user.sub;
     const assignment = await this.prisma.assignment.findFirst({
       where: {
         user_id: userId,
         deleted_at: null,
         OR: [
+          // Asignación para un módulo específico que coincide
           {
             module: {
               name: moduleName,
               deleted_at: null,
             },
           },
+          // Asignación para un programa que contiene ese módulo
           {
             program: {
               modules: {
@@ -46,13 +52,14 @@ export class PermissionsGuard implements CanActivate {
               },
             },
           },
+          // Asignación global (sin módulo ni programa) — el rol define acceso
+          {
+            AND: [
+              { module_id: null },
+              { program_id: null },
+            ],
+          },
         ],
-        NOT: {
-          AND: [
-            { module_id: null },
-            { program_id: null },
-          ],
-        },
       },
       include: { role: true },
     });

@@ -5,6 +5,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateUserDto } from './dto/create-auth.dto';
 import { UserService } from '../user/user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { SuperAdminGuard } from 'src/common/guards/super-admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -24,8 +25,9 @@ export class AuthController {
   }
 
   @Post('register')
+  @UseGuards(JwtAuthGuard, SuperAdminGuard)
   register(@Body() createUserDto: CreateUserDto) {
-  return this.authService.register(createUserDto);
+    return this.authService.register(createUserDto);
   }
 
   @Get('me/roles')

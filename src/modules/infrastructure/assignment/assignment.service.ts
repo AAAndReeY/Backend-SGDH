@@ -23,12 +23,23 @@ export class AssignmentService {
   async findAll(dto: SearchDto): Promise<any> {
     const { search, ...pagination } = dto;
     const where: any = { deleted_at: null };
-    if (search) where.name = String(search);
+    if (search) {
+      where.OR = [
+        { user: { username: { contains: String(search), mode: 'insensitive' } } },
+        { role: { name: { contains: String(search), mode: 'insensitive' } } },
+      ];
+    }
     return paginationHelper(
       this.prisma.assignment,
       {
         where,
-        orderBy: { name: 'asc' },
+        orderBy: { created_at: 'desc' },
+        include: {
+          user: { select: { id: true, username: true, name: true, lastname: true } },
+          role: { select: { id: true, name: true, is_super: true } },
+          module: { select: { id: true, name: true } },
+          program: { select: { id: true, name: true } },
+        },
       },
       pagination,
     );

@@ -8,14 +8,16 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { CreateRoleDto, UpdateRoleDto } from './dto';
+import { CreateRoleDto, SetRolePermissionsDto, UpdateRoleDto } from './dto';
 import { SearchDto } from '../../../common/dto';
 import { AuthGuard } from '@nestjs/passport';
+import { SuperAdminGuard } from 'src/common/guards/super-admin.guard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), SuperAdminGuard)
 @Controller('initial/role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
@@ -23,6 +25,11 @@ export class RoleController {
   @Get()
   findAll(@Query() dto: SearchDto) {
     return this.roleService.findAll(dto);
+  }
+
+  @Get(':id/permissions')
+  getPermissionsMatrix(@Param('id', ParseUUIDPipe) id: string) {
+    return this.roleService.getPermissionsMatrix(id);
   }
 
   @Get(':id')
@@ -33,6 +40,14 @@ export class RoleController {
   @Post()
   create(@Body() dto: CreateRoleDto) {
     return this.roleService.create(dto);
+  }
+
+  @Put(':id/permissions')
+  setPermissions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: SetRolePermissionsDto,
+  ) {
+    return this.roleService.setPermissions(id, dto);
   }
 
   @Patch(':id')

@@ -16,6 +16,7 @@ import { SupService } from './sup.service';
 import { CreateSupDto, FilterSupDto, UpdateSupDto } from './dto';
 import { PermissionsGuard } from '../../../../../common/guards/permissions.guard';
 import { RequirePermission } from '../../../../../common/decorators/require-permission.decorator';
+import { SuperAdminGuard } from 'src/common/guards/super-admin.guard';
 
 @UseGuards(AuthGuard('jwt'), PermissionsGuard)
 @Controller('support/sup')
@@ -50,5 +51,11 @@ export class SupController {
   @RequirePermission(Ability.DELETE, 'SUP')
   toggleDelete(@Param('id', ParseUUIDPipe) id: string) {
     return this.supService.toggleDelete(id);
+  }
+
+  @Post('sync-general')
+  @UseGuards(SuperAdminGuard)
+  syncToGeneral() {
+    return this.supService.syncToGeneral();
   }
 }
