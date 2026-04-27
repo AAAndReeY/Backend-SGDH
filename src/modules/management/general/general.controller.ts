@@ -20,31 +20,31 @@ export class GeneralController {
   }
 
   @Get()
-  @RequirePermission(Ability.READ, 'general')
+  @RequirePermission(Ability.READ, 'Lista General')
   findAll(@Query() dto: FilterGeneralDto) {
     return this.generalService.findAll(dto);
   }
 
   @Get(':id')
-  @RequirePermission(Ability.READ, 'general')
+  @RequirePermission(Ability.READ, 'Lista General')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.generalService.findOne(id);
   }
 
   @Patch('send/:id')
-  @RequirePermission(Ability.UPDATE, 'general')
+  @RequirePermission(Ability.UPDATE, 'Lista General')
   sendMessage(@Param('id') id: string, @Body() dto: { message: string }) {
     return this.generalService.sendMessage(id, dto.message);
   }
 
   @Patch('answer/:id')
-  @RequirePermission(Ability.UPDATE, 'general')
+  @RequirePermission(Ability.UPDATE, 'Lista General')
   sendanswer(@Param('id') id: string, @Body() dto: { answer: string }) {
     return this.generalService.answerMessage(id, dto.answer);
   }
 
   @Patch('observation')
-  @RequirePermission(Ability.UPDATE, 'general')
+  @RequirePermission(Ability.UPDATE, 'Lista General')
   updateObservation(
     @Body('citizen_id') citizen_id: string,
     @Body('observation') observation: string,

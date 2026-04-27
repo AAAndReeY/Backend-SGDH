@@ -21,19 +21,11 @@ export function filterGeneral(dto: FilterGeneralDto): any {
       { lastname: { contains: search, mode: 'insensitive' } },
       { dni: { contains: search, mode: 'insensitive' } },
     ];
-  if (module_name)
-    where.module = {
-      name: {
-        contains: module_name,
-        mode: 'insensitive',
-      },
-    };
   const today = new Date();
-  if (program_id) {
+  if (module_name || program_id) {
     where.module = {
-      program: {
-        id: program_id,
-      },
+      ...(module_name && { name: { contains: module_name, mode: 'insensitive' } }),
+      ...(program_id && { program: { id: program_id } }),
     };
   }
   if (age) {
