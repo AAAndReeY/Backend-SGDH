@@ -1,18 +1,14 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-  Query,
+  Controller, Get, Post, Body, Patch, Param,
+  Delete, ParseUUIDPipe, Query, UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AssignmentService } from './assignment.service';
 import { CreateAssignmentDto, UpdateAssignmentDto } from './dto';
 import { SearchDto } from '../../../common/dto';
+import { SuperAdminGuard } from 'src/common/guards/super-admin.guard';
 
+@UseGuards(AuthGuard('jwt'), SuperAdminGuard)
 @Controller('initial/assignment')
 export class AssignmentController {
   constructor(private readonly assignmentService: AssignmentService) {}
@@ -33,10 +29,7 @@ export class AssignmentController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateAssignmentDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAssignmentDto) {
     return this.assignmentService.update(id, dto);
   }
 
