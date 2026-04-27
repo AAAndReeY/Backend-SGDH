@@ -87,6 +87,11 @@ export class AuthService {
 }
 
 async getMe(userId: string) {
+  const userRecord = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, username: true, name: true, lastname: true, email: true },
+  });
+
   const assignments = await this.prisma.assignment.findMany({
     where: {
       user_id: userId,
@@ -108,13 +113,18 @@ async getMe(userId: string) {
       module: true,
     },
   });
+
   const isSuperAdmin = assignments.some((a) => a.role.is_super);
+  const roleName = assignments[0]?.role.name ?? null;
+
   if (isSuperAdmin) {
     const allModules = await this.prisma.module.findMany({
       where: { deleted_at: null },
     });
     return {
+      user: userRecord,
       is_super: true,
+      role: roleName,
       modules: allModules.map((m) => ({
         id: m.id,
         name: m.name,
@@ -122,13 +132,43 @@ async getMe(userId: string) {
       })),
     };
   }
-  const modules = assignments.map((a) => ({
-    id: a.module?.id,
-    name: a.module?.name,
-    abilities: a.role.accesses.map((ac) => ac.permission.ability),
+
+  // Build a deduplicated module map from role accesses and assignment module
+  const moduleMap = new Map<string, { id: string; name: string; abilities: Set<string> }>();
+
+  for (const a of assignments) {
+    if (a.module) {
+      // Assignment is scoped to a specific module
+      const entry = moduleMap.get(a.module.id) ?? { id: a.module.id, name: a.module.name, abilities: new Set<string>() };
+      const scopedAbilities = a.role.accesses
+        .filter((ac) => ac.permission.module_id === a.module!.id)
+        .map((ac) => ac.permission.ability as string);
+      // If no scoped permissions found, fall back to all role accesses
+      const abilities = scopedAbilities.length ? scopedAbilities : a.role.accesses.map((ac) => ac.permission.ability as string);
+      abilities.forEach((ab) => entry.abilities.add(ab));
+      moduleMap.set(a.module.id, entry);
+    } else {
+      // No module restriction — grant access to all modules the role has permissions for
+      for (const ac of a.role.accesses) {
+        const mod = ac.permission.module;
+        if (!mod) continue;
+        const entry = moduleMap.get(mod.id) ?? { id: mod.id, name: mod.name, abilities: new Set<string>() };
+        entry.abilities.add(ac.permission.ability as string);
+        moduleMap.set(mod.id, entry);
+      }
+    }
+  }
+
+  const modules = Array.from(moduleMap.values()).map((m) => ({
+    id: m.id,
+    name: m.name,
+    abilities: Array.from(m.abilities),
   }));
+
   return {
+    user: userRecord,
     is_super: false,
+    role: roleName,
     modules,
   };
 }
